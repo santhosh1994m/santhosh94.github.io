@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="logo">Portfolio Pro</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" data-section="dashboard">📊 Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-section="holdings">💼 Holdings</a></li>
+                <li><a href="#" class="nav-link" data-section="analytics">📈 Analytics</a></li>
+                <li><a href="#" class="nav-link" data-section="watchlist">👀 Watchlist</a></li>
+                <li><a href="#" class="nav-link" data-section="settings">⚙️ Settings</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle">☰</button>
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle" title="Toggle theme">🌙</button>
+                    <div class="user-profile">
+                        <span class="user-name">John Investor</span>
+                        <div class="user-avatar">JI</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="dashboard-grid">
+                    <!-- Portfolio Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="card summary-card">
+                            <div class="card__body">
+                                <h3>Total Value</h3>
+                                <p class="metric-value">$125,750.50</p>
+                                <p class="metric-change positive">+$2,150.75 (1.74%)</p>
+                            </div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="card__body">
+                                <h3>Total Return</h3>
+                                <p class="metric-value">$18,250.30</p>
+                                <p class="metric-change positive">+16.98%</p>
+                            </div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="card__body">
+                                <h3>Day's Change</h3>
+                                <p class="metric-value day-change">+$2,150.75</p>
+                                <p class="metric-change positive">+1.74%</p>
+                            </div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="card__body">
+                                <h3>Cash Available</h3>
+                                <p class="metric-value">$1,531.00</p>
+                                <p class="metric-change neutral">Available for investment</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="card chart-card">
+                            <div class="card__header">
+                                <h3>Asset Allocation</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="chart-container">
+                                    <canvas id="allocationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card chart-card">
+                            <div class="card__header">
+                                <h3>Portfolio Performance</h3>
+                                <div class="chart-controls">
+                                    <button class="btn btn--sm chart-period" data-period="1M">1M</button>
+                                    <button class="btn btn--sm chart-period active" data-period="3M">3M</button>
+                                    <button class="btn btn--sm chart-period" data-period="1Y">1Y</button>
+                                </div>
+                            </div>
+                            <div class="card__body">
+                                <div class="chart-container">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Holdings &amp; Recent Transactions -->
+                    <div class="info-row">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Top Holdings</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="holdings-list" id="topHoldings">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Recent Transactions</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="transactions-list" id="recentTransactions">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Holdings Section -->
+            <section id="holdings" class="section">
+                <div class="section-header">
+                    <h2>Portfolio Holdings</h2>
+                    <div class="section-actions">
+                        <button class="btn btn--primary" id="addHoldingBtn">Add Holding</button>
+                        <button class="btn btn--secondary" id="exportBtn">Export CSV</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card__header">
+                        <div class="holdings-filters">
+                            <input type="text" class="form-control" placeholder="Search holdings..." id="holdingsSearch">
+                            <select class="form-control" id="assetTypeFilter">
+                                <option value="all">All Assets</option>
+                                <option value="Stock">Stocks</option>
+                                <option value="ETF">ETFs</option>
+                                <option value="Bond ETF">Bond ETFs</option>
+                                <option value="Cryptocurrency">Crypto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="table-responsive">
+                            <table class="holdings-table" id="holdingsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="symbol">Symbol</th>
+                                        <th class="sortable" data-sort="name">Name</th>
+                                        <th class="sortable" data-sort="shares">Shares</th>
+                                        <th class="sortable" data-sort="current_price">Price</th>
+                                        <th class="sortable" data-sort="market_value">Market Value</th>
+                                        <th class="sortable" data-sort="day_change">Day Change</th>
+                                        <th class="sortable" data-sort="total_return">Total Return</th>
+                                        <th class="sortable" data-sort="percentage">% of Portfolio</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="holdingsTableBody">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="section">
+                <div class="section-header">
+                    <h2>Performance Analytics</h2>
+                </div>
+                
+                <div class="analytics-grid">
+                    <div class="card chart-card">
+                        <div class="card__header">
+                            <h3>Sector Allocation</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container">
+                                <canvas id="sectorChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Risk Metrics</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="metrics-grid">
+                                <div class="metric-item">
+                                    <span class="metric-label">Beta</span>
+                                    <span class="metric-value">1.24</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Sharpe Ratio</span>
+                                    <span class="metric-value">0.82</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Volatility</span>
+                                    <span class="metric-value">18.5%</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Annual Return</span>
+                                    <span class="metric-value">12.4%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Watchlist Section -->
+            <section id="watchlist" class="section">
+                <div class="section-header">
+                    <h2>Watchlist</h2>
+                    <button class="btn btn--primary" id="addWatchlistBtn">Add to Watchlist</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <div class="watchlist-grid" id="watchlistGrid">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Market News</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="news-list" id="newsList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h2>Settings</h2>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Profile Settings</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" value="John Investor">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="john@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Base Currency</label>
+                                <select class="form-control">
+                                    <option value="USD" selected>USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Portfolio Preferences</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="form-group">
+                                <label class="form-label">Risk Tolerance</label>
+                                <select class="form-control">
+                                    <option value="conservative">Conservative</option>
+                                    <option value="moderate" selected>Moderate</option>
+                                    <option value="aggressive">Aggressive</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Theme Preference</label>
+                                <select class="form-control" id="themeSelect">
+                                    <option value="auto" selected>Auto (System)</option>
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" checked> Email notifications
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" checked> Price alerts
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Holding Modal -->
+    <div class="modal" id="addHoldingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Holding</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addHoldingForm">
+                    <div class="form-group">
+                        <label class="form-label">Symbol</label>
+                        <input type="text" class="form-control" name="symbol" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Shares</label>
+                        <input type="number" class="form-control" name="shares" step="0.001" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Purchase Price</label>
+                        <input type="number" class="form-control" name="purchase_price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Asset Type</label>
+                        <select class="form-control" name="asset_type" required>
+                            <option value="Stock">Stock</option>
+                            <option value="ETF">ETF</option>
+                            <option value="Bond ETF">Bond ETF</option>
+                            <option value="Cryptocurrency">Cryptocurrency</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sector</label>
+                        <select class="form-control" name="sector">
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Consumer Discretionary">Consumer Discretionary</option>
+                            <option value="Consumer Staples">Consumer Staples</option>
+                            <option value="Energy">Energy</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Industrials">Industrials</option>
+                            <option value="Diversified">Diversified</option>
+                            <option value="Fixed Income">Fixed Income</option>
+                            <option value="Digital Assets">Digital Assets</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn btn--primary" form="addHoldingForm">Add Holding</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Watchlist Modal -->
+    <div class="modal" id="addWatchlistModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add to Watchlist</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addWatchlistForm">
+                    <div class="form-group">
+                        <label class="form-label">Symbol</label>
+                        <input type="text" class="form-control" name="symbol" placeholder="e.g., NVDA" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g., NVIDIA Corporation" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn btn--primary" form="addWatchlistForm">Add to Watchlist</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
